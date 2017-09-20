@@ -19,7 +19,7 @@ class ExampleUnitTest {
     @Test
     fun initialsDemo() {
         val testObserver = Observable.just("katy perry", "johnt bravo")
-                .map { it.trim().split("  ") }
+                .map { it.trim().split(" ") }
                 .flatMapIterable { it }
                 .map { it[0] }
                 .map { it.toUpperCase() }
