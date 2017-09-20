@@ -3,6 +3,7 @@ package com.kb.example.day3app.main
 import android.util.Log
 import com.kb.example.day3app.api_calls.DroidsOnRoids
 import com.kb.example.day3app.model.Post
+import com.kb.example.day3app.model.User
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
@@ -24,7 +25,7 @@ const val API_BASE_URL = "https://thedroidsonroids.com/wp-json/wp/v2/"
 
 class MainPresenter(val view: MainView) {
 
-    var service: DroidsOnRoids
+    private var service: DroidsOnRoids
 
     init {
         val client = OkHttpClient.Builder()
@@ -43,7 +44,11 @@ class MainPresenter(val view: MainView) {
         observable.debounce(EVENT_TIMEOUT, TimeUnit.MILLISECONDS)
                 .observeOn(Schedulers.io())
                 .switchMap {
-                    if (it.isBlank()) Observable.empty() else makePostsApiCall(it.toString())
+                    if (it.isBlank()) {
+                        Observable.just(listOf())
+                    } else {
+                        makePostsApiCall(it.toString())
+                    }
                 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy {
@@ -54,6 +59,10 @@ class MainPresenter(val view: MainView) {
 
     private fun makePostsApiCall(search: String): Observable<List<Post>> {
         return service.getPosts(search)
+    }
+
+    private fun makeAuthorApiCall(userID: Int): Observable<User> {
+        return service.getUserData(userID)
     }
 
 }
